@@ -5,10 +5,10 @@ using System.Collections;
 /// Spritesheet for Flappy Bird found here: http://www.spriters-resource.com/mobile_phone/flappybird/sheet/59537/
 /// Audio for Flappy Bird found here: https://www.youtube.com/watch?v=xY0sZUJWwA8
 /// </summary>
-public class FlappyScript : MonoBehaviour
+public class Player : MonoBehaviour
 {
 
-    public AudioClip FlyAudioClip, DeathAudioClip, ScoredAudioClip;
+    public AudioClip FlyAudioClip, DeathAudioClip, ScoredAudioClip, FireBallAudioClip;
     public Sprite GetReadySprite;
     public float RotateUpSpeed = 1, RotateDownSpeed = 1;
     public GameObject IntroGUI, DeathGUI;
@@ -39,6 +39,8 @@ public class FlappyScript : MonoBehaviour
 	void FireShot () {
 		nextFire = Time.time + fireRate;
 		Instantiate (shot, shotSpawn.position, shotSpawn.rotation);
+		GetComponent<AudioSource>().PlayOneShot(FireBallAudioClip);
+		//GetComponent<AudioSource>().PlayOneShot(FlyAudioClip);
 		//GetComponent<AudioSource> ().Play ();
 	}
 		
@@ -177,10 +179,10 @@ public class FlappyScript : MonoBehaviour
 		Debug.Log("OnCollisionEnter2D");
 		if (GameStateManager.GameState == GameState.Playing)
         {
-            if (col.gameObject.tag == "Floor")
-            {
-				PlayerDestroyed();
-            }
+//            if (col.gameObject.tag == "Floor")
+//            {
+//				PlayerDestroyed();
+//            }
         }
     }
 

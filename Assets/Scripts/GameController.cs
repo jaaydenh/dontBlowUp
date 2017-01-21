@@ -13,6 +13,10 @@ public class GameController : MonoBehaviour {
 	public float startWait;
 	public float waveWait;
 
+	public AudioClip BackgroundMusicAudioClip;
+
+	public Transform Player;
+
 	//public GUIText scoreText;
 	//public GUIText gameOverText;
 	//public GameObject restartButton;
@@ -23,6 +27,9 @@ public class GameController : MonoBehaviour {
 	private int enemyDestroyedCount;
 
 	void Start () {
+
+		GetComponent<AudioSource>().Play();
+
 		//gameOver = false;
 		//restart = true;
 	//	restartButton.SetActive (true);
@@ -63,7 +70,8 @@ public class GameController : MonoBehaviour {
 
 	IEnumerator SpawnEnemy () {
 		yield return new WaitForSeconds(spawnWait);
-		Vector3 position = new Vector3 (3, 0, 0);
+		float xPos = Player.position.x + 5.0f;
+		Vector3 position = new Vector3 (xPos, 0, 0);
 		Quaternion spawnRotation = Quaternion.identity;
 		//Instantiate (enemy, position, spawnRotation);
 	}

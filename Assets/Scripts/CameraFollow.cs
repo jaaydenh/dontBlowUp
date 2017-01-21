@@ -3,7 +3,8 @@ using System.Collections;
 
 public class CameraFollow : MonoBehaviour {
 
-	public float playerStartPosition = 3.5f;
+	public float playerStartPosition = 2.0f;
+	public Transform Player;
 
 	void Start () {
         cameraZ = transform.position.z;
@@ -12,8 +13,7 @@ public class CameraFollow : MonoBehaviour {
     float cameraZ;
 
 	void Update () {
+
 		transform.position = new Vector3(Player.position.x + playerStartPosition, 0, cameraZ);
 	}
-    
-    public Transform Player;
 }

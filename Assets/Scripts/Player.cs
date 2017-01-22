@@ -16,14 +16,14 @@ public class Player : MonoBehaviour
     public float VelocityPerJump = 3;
     public float XSpeed = 1;
 
-    FlappyYAxisTravelState flappyYAxisTravelState;
+    PlayerYAxisTravelState playerYAxisTravelState;
 
-    enum FlappyYAxisTravelState
+    enum PlayerYAxisTravelState
     {
         GoingUp, GoingDown
     }
 
-    Vector3 birdRotation = Vector3.zero;
+    Vector3 playerRotation = Vector3.zero;
     // Update is called once per frame
 
 	public GameObject shot;
@@ -35,13 +35,25 @@ public class Player : MonoBehaviour
 
 	private float nextFire;
 	private float touchVertical;
+	private GameController gameController;
+
+	void Start () {
+
+		GameObject gameControllerObject = GameObject.FindGameObjectWithTag ("GameController");
+		if (gameControllerObject != null)
+		{
+			gameController = gameControllerObject.GetComponent <GameController>();
+		}
+		if (gameController == null)
+		{
+			Debug.Log ("Cannot find 'GameController' script");
+		}
+	}
 
 	void FireShot () {
 		nextFire = Time.time + fireRate;
 		Instantiate (shot, shotSpawn.position, shotSpawn.rotation);
 		GetComponent<AudioSource>().PlayOneShot(FireBallAudioClip);
-		//GetComponent<AudioSource>().PlayOneShot(FlyAudioClip);
-		//GetComponent<AudioSource> ().Play ();
 	}
 		
     void Update()
@@ -63,6 +75,7 @@ public class Player : MonoBehaviour
                 GameStateManager.GameState = GameState.Playing;
                 IntroGUI.SetActive(false);
                 ScoreManagerScript.Score = 0;
+				StartCoroutine(gameController.SpawnEnemy());
             }
         } else if (GameStateManager.GameState == GameState.Playing) {
 			MovePlayerOnXAxis();
@@ -89,18 +102,22 @@ public class Player : MonoBehaviour
         }
     }
 
+	public void RestartGame() {
+		GameStateManager.GameState = GameState.Intro;
+		Application.LoadLevel(Application.loadedLevelName);
+	}
+
     void FixedUpdate()
     {
         //just jump up and down on intro screen
         if (GameStateManager.GameState == GameState.Intro)
         {
             if (GetComponent<Rigidbody2D>().velocity.y < -1) //when the speed drops, give a boost
-                GetComponent<Rigidbody2D>().AddForce(new Vector2(0, GetComponent<Rigidbody2D>().mass * 5500 * Time.deltaTime)); //lots of play and stop 
-                                                        //and play and stop etc to find this value, feel free to modify
+                GetComponent<Rigidbody2D>().AddForce(new Vector2(0, GetComponent<Rigidbody2D>().mass * 5500 * Time.deltaTime));
         }
         else if (GameStateManager.GameState == GameState.Playing || GameStateManager.GameState == GameState.Dead)
         {
-            //FixFlappyRotation();
+            //FixPlayerRotation();
         }
     }
 
@@ -123,46 +140,41 @@ public class Player : MonoBehaviour
         GetComponent<Rigidbody2D>().velocity = new Vector2(0, VelocityPerJump);
         GetComponent<AudioSource>().PlayOneShot(FlyAudioClip);
     }
-
-
-
-    /// <summary>
-    /// when the flappy goes up, it'll rotate up to 45 degrees. when it falls, rotation will be -90 degrees min
-    /// </summary>
-    private void FixFlappyRotation()
-    {
-        if (GetComponent<Rigidbody2D>().velocity.y > 0) flappyYAxisTravelState = FlappyYAxisTravelState.GoingUp;
-        else flappyYAxisTravelState = FlappyYAxisTravelState.GoingDown;
-
-        float degreesToAdd = 0;
-
-        switch (flappyYAxisTravelState)
-        {
-            case FlappyYAxisTravelState.GoingUp:
-                degreesToAdd = 6 * RotateUpSpeed;
-                break;
-            case FlappyYAxisTravelState.GoingDown:
-                degreesToAdd = -3 * RotateDownSpeed;
-                break;
-            default:
-                break;
-        }
-        //solution with negative eulerAngles found here: http://answers.unity3d.com/questions/445191/negative-eular-angles.html
-
-        //clamp the values so that -90<rotation<45 *always*
-        birdRotation = new Vector3(0, 0, Mathf.Clamp(birdRotation.z + degreesToAdd, -90, 45));
-        transform.eulerAngles = birdRotation;
-    }
+		
+//    private void FixPlayerRotation()
+//    {
+//        if (GetComponent<Rigidbody2D>().velocity.y > 0) playerYAxisTravelState = PlayerYAxisTravelState.GoingUp;
+//        else playerYAxisTravelState = PlayerYAxisTravelState.GoingDown;
+//
+//        float degreesToAdd = 0;
+//
+//        switch (playerYAxisTravelState)
+//        {
+//            case PlayerYAxisTravelState.GoingUp:
+//                degreesToAdd = 6 * RotateUpSpeed;
+//                break;
+//            case PlayerYAxisTravelState.GoingDown:
+//                degreesToAdd = -3 * RotateDownSpeed;
+//                break;
+//            default:
+//                break;
+//        }
+//        //solution with negative eulerAngles found here: http://answers.unity3d.com/questions/445191/negative-eular-angles.html
+//
+//        //clamp the values so that -90<rotation<45 *always*
+//		playerRotation = new Vector3(0, 0, Mathf.Clamp(playerRotation.z + degreesToAdd, -90, 45));
+//		transform.eulerAngles = playerRotation;
+//    }
 
     /// <summary>
-    /// check for collision with pipes
+    /// check for collisions
     /// </summary>
     /// <param name="col"></param>
     void OnTriggerEnter2D(Collider2D col)
     {
 		if (GameStateManager.GameState == GameState.Playing)
         {
-            if (col.gameObject.tag == "Pipeblank") //pipeblank is an empty gameobject with a collider between the two pipes
+            if (col.gameObject.tag == "Pipeblank")
             {
                 GetComponent<AudioSource>().PlayOneShot(ScoredAudioClip);
                 ScoreManagerScript.Score++;
@@ -179,10 +191,10 @@ public class Player : MonoBehaviour
 		Debug.Log("OnCollisionEnter2D");
 		if (GameStateManager.GameState == GameState.Playing)
         {
-//            if (col.gameObject.tag == "Floor")
-//            {
-//				PlayerDestroyed();
-//            }
+            if (col.gameObject.tag == "Enemy")
+            {
+				PlayerDestroyed();
+            }
         }
     }
 
@@ -192,5 +204,4 @@ public class Player : MonoBehaviour
         DeathGUI.SetActive(true);
         GetComponent<AudioSource>().PlayOneShot(DeathAudioClip);
     }
-
 }

@@ -3,8 +3,6 @@ using System.Collections;
 
 public class EnemyMovement : MonoBehaviour {
 
-	//public Transform player;
-
 	//public Boundary boundary;
 	public float tilt;
 	public float dodge;
@@ -24,8 +22,17 @@ public class EnemyMovement : MonoBehaviour {
 	{
 		rigidBody = GetComponent <Rigidbody2D> ();
 		//currentSpeed = GetComponent<Rigidbody>().velocity.z;
-		StartCoroutine(Evade());
+		//StartCoroutine(Evade());
 		xpos = 25;
+	}
+
+	void Update () {
+		MoveEnemyOnXAxis();
+	}
+
+	void MoveEnemyOnXAxis()
+	{
+		transform.position += new Vector3(Time.deltaTime * forwardSpeed, 0, 0);
 	}
 
 	IEnumerator Evade ()
@@ -47,8 +54,7 @@ public class EnemyMovement : MonoBehaviour {
 			
 			//xpos = Mathf.MoveTowards (xpos, 5, forwardSpeed * Time.deltaTime);
 			xpos = 5;
-			rigidBody.position = new Vector3(xpos, Mathf.Lerp(transform.position.y, player.GetComponent<Rigidbody2D> ().position.y + offset, Time.deltaTime * smoothing));
-			Debug.Log(rigidBody.position);
+			rigidBody.position = new Vector3(rigidBody.position.x, Mathf.Lerp(transform.position.y, player.GetComponent<Rigidbody2D> ().position.y + offset, Time.deltaTime * smoothing));
 			//rigidBody.position = new Vector3(xpos, 0, Mathf.Lerp(transform.position.y, player.GetComponent<Rigidbody2D> ().position.y + offset, Time.deltaTime * smoothing));
 		}
 		//float xpos = Mathf.Lerp(transform.position.x, player.transform.position.x, forwardSpeed);

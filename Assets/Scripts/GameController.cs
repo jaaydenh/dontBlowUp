@@ -12,6 +12,7 @@ public class GameController : MonoBehaviour {
 	public float spawnWait;
 	public float startWait;
 	public float waveWait;
+	public float enemySpawnOffset;
 
 	public AudioClip BackgroundMusicAudioClip;
 
@@ -37,7 +38,7 @@ public class GameController : MonoBehaviour {
 		score = 0;
 		enemyDestroyedCount = 0;
 		UpdateScore ();
-		StartCoroutine (SpawnEnemy ());
+		//StartCoroutine (SpawnEnemy ());
 	}
 
 //	void Update ()
@@ -68,12 +69,12 @@ public class GameController : MonoBehaviour {
 		//}
 	}
 
-	IEnumerator SpawnEnemy () {
+	public IEnumerator SpawnEnemy () {
 		yield return new WaitForSeconds(spawnWait);
-		float xPos = Player.position.x + 5.0f;
-		Vector3 position = new Vector3 (xPos, 0, 0);
+		float xSpawnPosition = Player.position.x + enemySpawnOffset;
+		Vector3 position = new Vector3 (xSpawnPosition, 0, 0);
 		Quaternion spawnRotation = Quaternion.identity;
-		//Instantiate (enemy, position, spawnRotation);
+		Instantiate (enemy, position, spawnRotation);
 	}
 
 	public void EnemyDestroyed () {

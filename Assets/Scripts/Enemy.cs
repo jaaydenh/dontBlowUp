@@ -6,7 +6,6 @@ public class Enemy : MonoBehaviour {
 	public GameObject explosion;
 	public GameObject playerExplosion;
 	public int scoreValue;
-	public float XSpeed = 1;
 	private GameController gameController;
 
 	void Start ()
@@ -20,15 +19,6 @@ public class Enemy : MonoBehaviour {
 		{
 			Debug.Log ("Cannot find 'GameController' script");
 		}
-	}
-
-	void Update () {
-		MoveEnemyOnXAxis();
-	}
-
-	void MoveEnemyOnXAxis()
-	{
-		transform.position += new Vector3(Time.deltaTime * XSpeed, 0, 0);
 	}
 
 	void OnTriggerEnter2D (Collider2D other)

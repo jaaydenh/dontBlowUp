@@ -8,7 +8,7 @@ public class GameController : MonoBehaviour {
 	public GameObject hazard;
 	public GameObject enemy;
 	public Vector3 spawnValues;
-	public int asteroidCount;
+	public int hazardCount;
 	public float spawnWait;
 	public float startWait;
 	public float waveWait;
@@ -56,16 +56,29 @@ public class GameController : MonoBehaviour {
 //		}
 //	}
 
-	IEnumerator SpawnAsteroids () {
+	public void SpawnNextEncounter() {
+
+		if (enemyDestroyedCount == 1) {
+			StartCoroutine (SpawnHazards ());
+			enemyDestroyedCount = 0;
+		}  else {
+			StartCoroutine (SpawnEnemy ());
+		}
+	}
+
+	public IEnumerator SpawnHazards () {
 		yield return new WaitForSeconds (startWait);
 
 		//while (true) {
-		for (int i = 0; i < asteroidCount; i++) {
-			Vector3 spawnPosition = new Vector3 (spawnValues.x, spawnValues.y, Random.Range (-spawnValues.z, spawnValues.z));
+		for (int i = 0; i < hazardCount; i++) {
+			float xSpawnPosition = Player.position.x + spawnValues.x;
+			Vector3 spawnPosition = new Vector3 (xSpawnPosition, Random.Range (-spawnValues.y, spawnValues.y), spawnValues.z);
 			Quaternion spawnRotation = Quaternion.identity;
 			Instantiate (hazard, spawnPosition, spawnRotation);
 			yield return new WaitForSeconds(spawnWait);
 		}
+		yield return new WaitForSeconds(waveWait);
+		SpawnNextEncounter();
 		//}
 	}
 
@@ -79,12 +92,7 @@ public class GameController : MonoBehaviour {
 
 	public void EnemyDestroyed () {
 		enemyDestroyedCount++;
-
-		//if (enemyDestroyedCount == 3) {
-		//	StartCoroutine (SpawnAsteroids ());
-		//}  else {
-			StartCoroutine (SpawnEnemy ());
-		//}
+		SpawnNextEncounter();
 	}
 
 //	IEnumerator ReloadGame () {

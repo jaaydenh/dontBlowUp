@@ -1,10 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
+using UnityEngine.SceneManagement;
 
-/// <summary>
-/// Spritesheet for Flappy Bird found here: http://www.spriters-resource.com/mobile_phone/flappybird/sheet/59537/
-/// Audio for Flappy Bird found here: https://www.youtube.com/watch?v=xY0sZUJWwA8
-/// </summary>
 public class Player : MonoBehaviour
 {
 
@@ -12,7 +9,6 @@ public class Player : MonoBehaviour
     public Sprite GetReadySprite;
     public float RotateUpSpeed = 1, RotateDownSpeed = 1;
     public GameObject IntroGUI, DeathGUI;
-    public Collider2D restartButtonGameCollider;
     public float VelocityPerJump = 3;
     public float XSpeed = 1;
 
@@ -23,8 +19,7 @@ public class Player : MonoBehaviour
         GoingUp, GoingDown
     }
 
-    Vector3 playerRotation = Vector3.zero;
-    // Update is called once per frame
+    //Vector3 playerRotation = Vector3.zero;
 
 	public GameObject shot;
 	public Transform shotSpawn;
@@ -61,50 +56,52 @@ public class Player : MonoBehaviour
 		if (shootButton.CanShoot () && Time.time > nextFire) {
 			FireShot ();
 		} 
-//		else if (Input.GetButton ("Fire1") && Time.time > nextFire) {
-//			Debug.Log("fireshot 2");
-//			FireShot ();
-//		}
 
-        if (GameStateManager.GameState == GameState.Intro)
-        {
-			MovePlayerOnXAxis();
-            if (WasTouchedOrClicked())
-            {
-                BoostOnYAxis();
-                GameStateManager.GameState = GameState.Playing;
-                IntroGUI.SetActive(false);
-                ScoreManagerScript.Score = 0;
-				StartCoroutine(gameController.SpawnEnemy());
-            }
-        } else if (GameStateManager.GameState == GameState.Playing) {
+//        if (GameStateManager.GameState == GameState.Intro)
+//        {
+//			MovePlayerOnXAxis();
+//            if (WasTouchedOrClicked())
+//            {
+//                BoostOnYAxis();
+//                GameStateManager.GameState = GameState.Playing;
+//                IntroGUI.SetActive(false);
+//                ScoreManagerScript.Score = 0;
+//				StartCoroutine(gameController.SpawnEnemy());
+//            }
+//        } else
+		
+		if (GameStateManager.GameState == GameState.Playing) {
 			MovePlayerOnXAxis();
             if (WasTouchedOrClicked())
 			if (flyAreaButton.CanFly())
             {
                 BoostOnYAxis();
             }
-        } else if (GameStateManager.GameState == GameState.Dead) {
-            Vector2 contactPoint = Vector2.zero;
-
-            if (Input.touchCount > 0)
-                contactPoint = Input.touches[0].position;
-            if (Input.GetMouseButtonDown(0))
-                contactPoint = Input.mousePosition;
-
-            //check if user wants to restart the game
-            if (restartButtonGameCollider == Physics2D.OverlapPoint
-                (Camera.main.ScreenToWorldPoint(contactPoint)))
-            {
-                GameStateManager.GameState = GameState.Intro;
-                Application.LoadLevel(Application.loadedLevelName);
-            }
-        }
+        } 
+//		else if (GameStateManager.GameState == GameState.Dead) {
+//            Vector2 contactPoint = Vector2.zero;
+//
+//            if (Input.touchCount > 0)
+//                contactPoint = Input.touches[0].position;
+//            if (Input.GetMouseButtonDown(0))
+//                contactPoint = Input.mousePosition;
+//        }
     }
+
+	public void StartGame() {
+		MovePlayerOnXAxis();
+		BoostOnYAxis();
+		GameStateManager.GameState = GameState.Playing;
+		IntroGUI.SetActive(false);
+		ScoreManagerScript.Score = 0;
+		//StartCoroutine(gameController.SpawnEnemy());
+		gameController.SpawnNextEncounter();
+		//StartCoroutine(gameController.SpawnHazards());
+	}
 
 	public void RestartGame() {
 		GameStateManager.GameState = GameState.Intro;
-		Application.LoadLevel(Application.loadedLevelName);
+		SceneManager.LoadScene("mainGame");
 	}
 
     void FixedUpdate()
@@ -179,7 +176,7 @@ public class Player : MonoBehaviour
                 GetComponent<AudioSource>().PlayOneShot(ScoredAudioClip);
                 ScoreManagerScript.Score++;
             }
-			else if (col.gameObject.tag == "Pipe" || col.gameObject.tag == "Enemy" || col.gameObject.tag == "EnemyShot")
+			else if (col.gameObject.tag == "Pipe" || col.gameObject.tag == "Enemy" || col.gameObject.tag == "EnemyShot" || col.gameObject.tag == "Hazard")
             {
 				PlayerDestroyed();
             }
@@ -188,7 +185,6 @@ public class Player : MonoBehaviour
 
     void OnCollisionEnter2D(Collision2D col)
     {
-		Debug.Log("OnCollisionEnter2D");
 		if (GameStateManager.GameState == GameState.Playing)
         {
             if (col.gameObject.tag == "Enemy")

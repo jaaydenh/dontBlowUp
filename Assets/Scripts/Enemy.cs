@@ -23,7 +23,6 @@ public class Enemy : MonoBehaviour {
 
 	void OnTriggerEnter2D (Collider2D other)
 	{
-		Debug.Log("OnTriggerEnter Enemy");
 		if (other.CompareTag ("Boundary") || other.CompareTag ("Enemy") || other.CompareTag ("EnemyShot"))
 		{
 			return;
@@ -35,7 +34,6 @@ public class Enemy : MonoBehaviour {
 		}
 
 		if (this.CompareTag("Enemy")) {
-			Debug.Log ("Enemy Destroyed");
 			gameController.EnemyDestroyed ();
 		}
 		//gameController.AddScore(scoreValue);

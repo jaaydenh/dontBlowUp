@@ -19,46 +19,21 @@ public class GameController : MonoBehaviour {
 	public Transform Player;
 
 	//public GUIText scoreText;
-	//public GUIText gameOverText;
-	//public GameObject restartButton;
 
-	//private bool gameOver;
-//	private bool restart;
 	private int score;
 	private int enemyDestroyedCount;
 
 	void Start () {
 
 		GetComponent<AudioSource>().Play();
-
-		//gameOver = false;
-		//restart = true;
-	//	restartButton.SetActive (true);
-		//gameOverText.text = "";
 		score = 0;
 		enemyDestroyedCount = 0;
 		UpdateScore ();
-		//StartCoroutine (SpawnEnemy ());
 	}
-
-//	void Update ()
-//	{
-//		if (restart)
-//		{
-//			if (Input.GetKeyDown (KeyCode.R))
-//			{
-//				RestartGame();
-//			}
-//		}
-//		if (gameOver)
-//		{
-//			StartCoroutine(ReloadGame ());
-//		}
-//	}
 
 	public void SpawnNextEncounter() {
 
-		if (enemyDestroyedCount == 1) {
+		if (enemyDestroyedCount == 3) {
 			StartCoroutine (SpawnHazards ());
 			enemyDestroyedCount = 0;
 		}  else {
@@ -69,7 +44,6 @@ public class GameController : MonoBehaviour {
 	public IEnumerator SpawnHazards () {
 		yield return new WaitForSeconds (startWait);
 
-		//while (true) {
 		for (int i = 0; i < hazardCount; i++) {
 			float xSpawnPosition = Player.position.x + spawnValues.x;
 			Vector3 spawnPosition = new Vector3 (xSpawnPosition, Random.Range (-spawnValues.y, spawnValues.y), spawnValues.z);
@@ -79,7 +53,6 @@ public class GameController : MonoBehaviour {
 		}
 		yield return new WaitForSeconds(waveWait);
 		SpawnNextEncounter();
-		//}
 	}
 
 	public IEnumerator SpawnEnemy () {
@@ -94,12 +67,7 @@ public class GameController : MonoBehaviour {
 		enemyDestroyedCount++;
 		SpawnNextEncounter();
 	}
-
-//	IEnumerator ReloadGame () {
-//		yield return new WaitForSeconds(3);
-//		SceneManager.LoadScene ("Main");
-//	}
-
+		
 	public void AddScore (int newScoreValue)
 	{
 		score += newScoreValue;
@@ -110,17 +78,4 @@ public class GameController : MonoBehaviour {
 	{
 		//scoreText.text = "Score: " + score;
 	}
-
-//	public void GameOver ()
-//	{
-//		gameOverText.text = "Game Over!";
-//		gameOver = true;
-//	}
-//
-//	public void RestartGame () {
-//		StartCoroutine (SpawnEnemyShip ());
-//		restartButton.SetActive (false);
-//		restart = false;
-//	}
 }
-

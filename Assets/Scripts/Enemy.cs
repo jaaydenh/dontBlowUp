@@ -7,6 +7,7 @@ public class Enemy : MonoBehaviour {
 	public GameObject playerExplosion;
 	public int scoreValue;
 	private GameController gameController;
+	private ParticleSystem explosion1;
 
 	void Start ()
 	{
@@ -19,6 +20,8 @@ public class Enemy : MonoBehaviour {
 		{
 			Debug.Log ("Cannot find 'GameController' script");
 		}
+
+		explosion1 = GetComponent<ParticleSystem>();
 	}
 
 	void OnTriggerEnter2D (Collider2D other)
@@ -34,11 +37,17 @@ public class Enemy : MonoBehaviour {
 		}
 
 		if (this.CompareTag("Enemy")) {
-			gameController.EnemyDestroyed ();
+			
+			explosion1.Play();
+			StartCoroutine(DestroyEnemy(other));
 		}
-		//gameController.AddScore(scoreValue);
+	}
+
+	IEnumerator DestroyEnemy(Collider2D other) {
+
+		yield return new WaitForSeconds(0.01f);
 		Destroy (other.gameObject);
 		Destroy (gameObject);
+		gameController.EnemyDestroyed ();
 	}
 }
-

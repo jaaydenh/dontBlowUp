@@ -8,4 +8,3 @@ class ShotDestroyer : MonoBehaviour
 			Destroy(col.gameObject);
 	}
 }
-

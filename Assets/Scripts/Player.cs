@@ -11,6 +11,7 @@ public class Player : MonoBehaviour
     public GameObject IntroGUI, DeathGUI;
     public float VelocityPerJump = 3;
     public float XSpeed = 1;
+	private ParticleSystem explosion;
 
     PlayerYAxisTravelState playerYAxisTravelState;
 
@@ -24,12 +25,14 @@ public class Player : MonoBehaviour
 	public GameObject shot;
 	public Transform shotSpawn;
 	public float fireRate;
+	public float playerHeatThreshold;
 
 	public ShootAreaButton shootButton;
 	public FlyAreaButton flyAreaButton;
 
 	private float nextFire;
 	private float touchVertical;
+	private float playerHeatLevel;
 	private GameController gameController;
 
 	void Start () {
@@ -43,6 +46,8 @@ public class Player : MonoBehaviour
 		{
 			Debug.Log ("Cannot find 'GameController' script");
 		}
+
+		explosion = GetComponent<ParticleSystem>();
 	}
 
 	void FireShot () {
@@ -55,37 +60,20 @@ public class Player : MonoBehaviour
     {
 		if (shootButton.CanShoot () && Time.time > nextFire) {
 			FireShot ();
-		} 
-
-//        if (GameStateManager.GameState == GameState.Intro)
-//        {
-//			MovePlayerOnXAxis();
-//            if (WasTouchedOrClicked())
-//            {
-//                BoostOnYAxis();
-//                GameStateManager.GameState = GameState.Playing;
-//                IntroGUI.SetActive(false);
-//                ScoreManagerScript.Score = 0;
-//				StartCoroutine(gameController.SpawnEnemy());
-//            }
-//        } else
+		} else if (Input.GetKeyDown(KeyCode.Space) && Time.time > nextFire) {
+			FireShot ();
+		}
 		
 		if (GameStateManager.GameState == GameState.Playing) {
 			MovePlayerOnXAxis();
-            if (WasTouchedOrClicked())
+            //if (WasTouchedOrClicked())
 			if (flyAreaButton.CanFly())
             {
-                BoostOnYAxis();
-            }
+				BoostOnYAxis();
+			} else if (Input.GetKeyDown(KeyCode.UpArrow)) {
+				BoostOnYAxis();
+			}
         } 
-//		else if (GameStateManager.GameState == GameState.Dead) {
-//            Vector2 contactPoint = Vector2.zero;
-//
-//            if (Input.touchCount > 0)
-//                contactPoint = Input.touches[0].position;
-//            if (Input.GetMouseButtonDown(0))
-//                contactPoint = Input.mousePosition;
-//        }
     }
 
 	public void StartGame() {
@@ -94,9 +82,7 @@ public class Player : MonoBehaviour
 		GameStateManager.GameState = GameState.Playing;
 		IntroGUI.SetActive(false);
 		ScoreManagerScript.Score = 0;
-		//StartCoroutine(gameController.SpawnEnemy());
 		gameController.SpawnNextEncounter();
-		//StartCoroutine(gameController.SpawnHazards());
 	}
 
 	public void RestartGame() {
@@ -163,10 +149,6 @@ public class Player : MonoBehaviour
 //		transform.eulerAngles = playerRotation;
 //    }
 
-    /// <summary>
-    /// check for collisions
-    /// </summary>
-    /// <param name="col"></param>
     void OnTriggerEnter2D(Collider2D col)
     {
 		if (GameStateManager.GameState == GameState.Playing)
@@ -194,10 +176,15 @@ public class Player : MonoBehaviour
         }
     }
 
-    void PlayerDestroyed()
+	void PlayerDestroyed()
     {
         GameStateManager.GameState = GameState.Dead;
         DeathGUI.SetActive(true);
+
+		explosion.Play();
         GetComponent<AudioSource>().PlayOneShot(DeathAudioClip);
+
+		GameObject playerBody = GameObject.Find("playerBody");
+		playerBody.SetActive(false);
     }
 }

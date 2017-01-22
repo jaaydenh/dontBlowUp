@@ -5,13 +5,11 @@ public class ScoreManagerScript : MonoBehaviour {
 
     public static int Score { get; set; }
 
-	// Use this for initialization
 	void Start () {
         (Tens.gameObject as GameObject).SetActive(false);
         (Hundreds.gameObject as GameObject).SetActive(false);
 	}
-	
-	// Update is called once per frame
+
 	void Update () {
 
         if (previousScore != Score) //save perf from non needed calculations
@@ -38,8 +36,7 @@ public class ScoreManagerScript : MonoBehaviour {
         }
 
 	}
-
-
+		
     int previousScore = -1;
     public Sprite[] numberSprites;
     public SpriteRenderer Units, Tens, Hundreds;

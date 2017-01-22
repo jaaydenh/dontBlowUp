@@ -46,7 +46,7 @@ public class Enemy : MonoBehaviour {
 	IEnumerator DestroyEnemy(Collider2D other) {
 
 		yield return new WaitForSeconds(0.01f);
-		Destroy (other.gameObject);
+		//Destroy (other.gameObject);
 		Destroy (gameObject);
 		gameController.EnemyDestroyed ();
 	}

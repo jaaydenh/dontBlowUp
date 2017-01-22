@@ -26,13 +26,15 @@ public class Player : MonoBehaviour
 	public Transform shotSpawn;
 	public float fireRate;
 	public float playerHeatThreshold;
+	public float shotHeatIncrement;
+	public float timeHeatDecrement;
 
 	public ShootAreaButton shootButton;
 	public FlyAreaButton flyAreaButton;
 
 	private float nextFire;
 	private float touchVertical;
-	private float playerHeatLevel;
+	private float playerHeatLevel = 0;
 	private GameController gameController;
 
 	void Start () {
@@ -54,6 +56,8 @@ public class Player : MonoBehaviour
 		nextFire = Time.time + fireRate;
 		Instantiate (shot, shotSpawn.position, shotSpawn.rotation);
 		GetComponent<AudioSource>().PlayOneShot(FireBallAudioClip);
+		playerHeatLevel = playerHeatLevel + shotHeatIncrement;
+		Debug.Log("playerHeatLevel: " + playerHeatLevel);
 	}
 		
     void Update()
@@ -74,6 +78,16 @@ public class Player : MonoBehaviour
 				BoostOnYAxis();
 			}
         } 
+
+		if (playerHeatLevel >= playerHeatThreshold) {
+			playerHeatLevel = 0;
+			PlayerDestroyed();
+		}
+		if (playerHeatLevel > 0) {
+			
+			playerHeatLevel = playerHeatLevel - timeHeatDecrement;	
+			Debug.Log("decrease heat level: " + playerHeatLevel);
+		}
     }
 
 	public void StartGame() {
